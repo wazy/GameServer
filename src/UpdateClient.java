@@ -1,6 +1,7 @@
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
@@ -8,26 +9,30 @@ import java.sql.SQLException;
 public class UpdateClient {
 
 	public static void sendOnlinePlayers(Socket connection, BufferedOutputStream bos) throws InterruptedException, SQLException {
+		int position = 0;
 		int id = GameServer.getPlayerId();
-		int position = Player.onlinePlayers.size() - 1;
-		System.out.println(position);
 		try {
-			//int playerIdTestIterator = 1;
+			BufferedOutputStream bos1 = new BufferedOutputStream(connection.getOutputStream());
 			ObjectOutputStream outputStream = new ObjectOutputStream(bos);
-			// just some example code to fake multiple players
+			OutputStreamWriter osw = new OutputStreamWriter(bos1, "US-ASCII");
 			while (true) {
-				// 3 second pause
+				// 3 second pause between updates
 				Thread.sleep(3000);
-
-				/* if (playerIdTestIterator > 6) {
-					playerIdTestIterator = 1;
-				} */
-				// fake online connections
-				//DatabaseHandler.queryAuth(String.valueOf(playerIdTestIterator));
+				
+				position = Player.getPosition(id);
+				// player has to actually be in the ArrayList
+				if (position < 0) {
+					System.exit(1); // should never get here
+				}
+				System.out.println("Player ID: " + id + " is at position: " + position);
+				
+				// write player position in list to client
+				osw.write(position + (char) 13);
+				osw.flush();
+				
 				outputStream.reset();
 				outputStream.writeObject(Player.onlinePlayers);
 				outputStream.flush();
-				//playerIdTestIterator++;
 			}
 		}
 		catch (SocketException e) {

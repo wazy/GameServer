@@ -32,7 +32,7 @@ public class GameServer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	GameServer(Socket s, int i){
+	GameServer(Socket s, int i) {
 		this.connection = s;
 		//this.ID = i;
 	}

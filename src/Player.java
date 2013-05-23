@@ -59,4 +59,14 @@ public class Player implements Serializable {
 			return false;
 		return true;
 	}
+
+	public static int getPosition(int clientId) {
+		// what position is the player currently at in the list
+		for (int i = 0; i < Player.onlinePlayers.size(); i++) {
+			if (Player.onlinePlayers.get(i).id == clientId) {
+				return i;
+			}
+		}
+		return -1; // shouldn't get here
+	}
 }
