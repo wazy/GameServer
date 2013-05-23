@@ -63,14 +63,14 @@ public class DatabaseHandler {
 		}
 	}
 
-	public static void removeOnline(int playerId) throws SQLException {
+	public static void removeOnline(int playerId, int position) throws SQLException {
 		// just going to remove a player from online status
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 		st.executeUpdate("UPDATE gameDB.players SET ONLINE = 0 WHERE Id = " + playerId);
 		
 		// if (Player.onlinePlayers.contains(new Player(playerId,"Player2",50,25)));
-		
+		Player.onlinePlayers.remove(position);
 		// cleanup -- important
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);

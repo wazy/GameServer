@@ -9,6 +9,8 @@ public class UpdateClient {
 
 	public static void sendOnlinePlayers(Socket connection, BufferedOutputStream bos) throws InterruptedException, SQLException {
 		int id = GameServer.getPlayerId();
+		int position = Player.onlinePlayers.size() - 1;
+		System.out.println(position);
 		try {
 			//int playerIdTestIterator = 1;
 			ObjectOutputStream outputStream = new ObjectOutputStream(bos);
@@ -33,7 +35,7 @@ public class UpdateClient {
 				// hack .. fix this if possible 
 				// throws socket exception indicating closed/lost connection from client
 				System.out.println("\nPlayer " + id + " has disconnected.");
-				DatabaseHandler.removeOnline(id);
+				DatabaseHandler.removeOnline(id, position);
 				connection.shutdownOutput();
 				connection.close();
 			} catch (IOException e1) {
