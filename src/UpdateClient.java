@@ -1,7 +1,6 @@
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
@@ -12,9 +11,7 @@ public class UpdateClient {
 		int position = 0;
 		int id = GameServer.getPlayerId();
 		try {
-			BufferedOutputStream bos1 = new BufferedOutputStream(connection.getOutputStream());
 			ObjectOutputStream outputStream = new ObjectOutputStream(bos);
-			OutputStreamWriter osw = new OutputStreamWriter(bos1, "US-ASCII");
 			while (true) {
 				// 3 second pause between updates
 				Thread.sleep(3000);
@@ -27,9 +24,8 @@ public class UpdateClient {
 				System.out.println("Player ID: " + id + " is at position: " + position);
 				
 				// write player position in list to client
-				osw.write(position + (char) 13);
-				osw.flush();
-				
+				outputStream.writeInt(position);
+				outputStream.flush();
 				outputStream.reset();
 				outputStream.writeObject(Player.onlinePlayers);
 				outputStream.flush();
