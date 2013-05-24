@@ -42,8 +42,8 @@ public class GameServer implements Runnable {
 				// input reader / output writer init
 				BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
 				OutputStreamWriter osw = new OutputStreamWriter(bos, "US-ASCII");
-				BufferedInputStream is = new BufferedInputStream(connection.getInputStream());
-				InputStreamReader isr = new InputStreamReader(is);
+				BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
+				InputStreamReader isr = new InputStreamReader(bis);
 				int character;
 				StringBuffer process = new StringBuffer();
 				StringBuffer id = new StringBuffer();
@@ -79,12 +79,22 @@ public class GameServer implements Runnable {
 					osw.close();
 					break;
 				}
-				System.out.println("not authenticated");
-				
-				osw.write("0"+ (char) 13);
-				osw.flush();
-				osw.close();
-				break;
+				// client coordinate update thread connected
+				else if (process.toString().contentEquals("update")) {
+					System.out.println("\nauthenticated client");
+					osw.write("1" + (char) 13);
+					osw.flush();
+					// send other players to client
+					UpdateCoordinates.acceptCoordinates(connection, bis);
+				}
+				else {
+					System.out.println("Authentication failure");
+					System.out.println(process.toString());
+					osw.write("0"+ (char) 13);
+					osw.flush();
+					osw.close();
+					break;
+				}
 			}
 		}
 		catch (Exception e) {

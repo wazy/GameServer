@@ -75,4 +75,14 @@ public class DatabaseHandler {
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);
 	}
+	
+	// update player's coordinates here
+	public static void updateCoordinates(int id, int listPosition, int x, int y) throws SQLException {
+		Connection conn = DatabaseConnection.getConnection();
+		Statement st = conn.createStatement();
+		st.executeUpdate("UPDATE gameDB.players SET X-Pos = " + x + "Y-Pos = " + y + " WHERE Id = " + id);
+		// update in list.. TODO put a lock on the arraylist when threads concurrently use
+		Player.onlinePlayers.get(listPosition).x = x;
+		Player.onlinePlayers.get(listPosition).x = y;
+	}
 }
