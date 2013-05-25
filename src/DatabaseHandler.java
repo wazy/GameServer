@@ -36,7 +36,7 @@ public class DatabaseHandler {
 		DatabaseConnection.closeConnection(conn);
 	}
 	
-	public static String queryAuth(String id) {
+	public static String queryAuth(int id) {
 		try {
 			String player = null;
 			Connection conn = DatabaseConnection.getConnection();

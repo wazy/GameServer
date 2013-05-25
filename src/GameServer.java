@@ -41,58 +41,58 @@ public class GameServer implements Runnable {
 			while (true) {
 				// input reader / output writer init
 				BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
-				OutputStreamWriter osw = new OutputStreamWriter(bos, "US-ASCII");
+				ObjectOutputStream oos = new ObjectOutputStream(bos);
+				oos.flush();
 				BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-				InputStreamReader isr = new InputStreamReader(bis);
+				ObjectInputStream ois = new ObjectInputStream(bis);
 				int character;
 				StringBuffer process = new StringBuffer();
-				StringBuffer id = new StringBuffer();
+				int id;
 				
-				while((character = isr.read()) != 13) {
+				while((character = ois.readChar()) != 13) {
 					process.append((char)character);
 				}
 				// client wants to authenticate
 				if (process.toString().contentEquals("auth")) {
 					System.out.println("\nauthenticated client");
-					osw.write("1" + (char) 13);
-					osw.flush();
-					
-					while((character = isr.read()) != 13) {
-						id.append((char) character);
-					}
+					oos.writeInt(1);
+					oos.flush();
+
+					id = ois.readInt();
 					// player id, name and x y coordinates (, delimited)
 					// should be from database -- i.e. (1, testuser, 100, 200)
-					System.out.println("Player Id = " + id.toString());
-					String playerInfo  = DatabaseHandler.queryAuth(id.toString());
+					System.out.println("Player Id = " + id);
+					String playerInfo  = DatabaseHandler.queryAuth(id);
 					// player doesn't exist in DB?
 					if (playerInfo != null) {
-						setPlayerId(Integer.parseInt(id.toString()));
-						osw.write(playerInfo + (char) 13);
-						osw.flush();
+						setPlayerId(id);
+						oos.writeChars(playerInfo + (char) 13);
+						oos.flush();
 						// send other players to client
-						UpdateClient.sendOnlinePlayers(connection, bos);
+						// UpdateClient.sendOnlinePlayers(oos);
 					}
 					else {
-						osw.write("create");
-						osw.flush();
+						oos.writeChars("create" + (char) 13);
+						oos.flush();
 					}
-					osw.close();
+					// oos.close();
+					// ois.close();
 					break;
 				}
 				// client coordinate update thread connected
 				else if (process.toString().contentEquals("update")) {
 					System.out.println("\nauthenticated client");
-					osw.write("1" + (char) 13);
-					osw.flush();
+					oos.writeInt(1);
+					oos.flush();
 					// send other players to client
-					UpdateCoordinates.acceptCoordinates(connection, bis);
+					// UpdateCoordinates.acceptCoordinates(ois);
 				}
 				else {
 					System.out.println("Authentication failure");
 					System.out.println(process.toString());
-					osw.write("0"+ (char) 13);
-					osw.flush();
-					osw.close();
+					oos.writeInt(0);
+					oos.flush();
+					oos.close();
 					break;
 				}
 			}

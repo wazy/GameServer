@@ -1,17 +1,14 @@
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 
 public class UpdateClient {
 
-	public static void sendOnlinePlayers(Socket connection, BufferedOutputStream bos) throws InterruptedException, SQLException {
+	public static void sendOnlinePlayers(ObjectOutputStream outputStream) throws InterruptedException, SQLException {
 		int position = 0;
 		int id = GameServer.getPlayerId();
 		try {
-			ObjectOutputStream outputStream = new ObjectOutputStream(bos);
 			while (true) {
 				// 3 second pause between updates
 				Thread.sleep(3000);
@@ -26,9 +23,11 @@ public class UpdateClient {
 				// write player position in list to client
 				outputStream.writeInt(position);
 				outputStream.flush();
+				System.out.println("position");
 				outputStream.reset();
 				outputStream.writeObject(Player.onlinePlayers);
 				outputStream.flush();
+				System.out.println("somes");
 			}
 		}
 		catch (SocketException e) {
@@ -37,11 +36,9 @@ public class UpdateClient {
 				// throws socket exception indicating closed/lost connection from client
 				System.out.println("\nPlayer " + id + " has disconnected.");
 				DatabaseHandler.removeOnline(id, position);
-				connection.shutdownOutput();
-				connection.close();
-			} catch (IOException e1) {
+			} catch (Exception e1) {
+				
 			}
-			
 		}
 		catch (IOException ioe) {
 		}
