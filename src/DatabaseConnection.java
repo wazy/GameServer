@@ -20,8 +20,8 @@ public class DatabaseConnection {
 			config.setJdbcUrl(prop.getProperty("database"));
 			config.setUsername(prop.getProperty("dbuser"));
 			config.setPassword(prop.getProperty("dbpassword"));
-			config.setMinConnectionsPerPartition(2);   
-			config.setMaxConnectionsPerPartition(4);
+			config.setMinConnectionsPerPartition(3);   
+			config.setMaxConnectionsPerPartition(5);
 			config.setPartitionCount(1); // 1*2 = 2 connections
 			//config.setLazyInit(true); // depends on the application usage
 			connectionPool = new BoneCP(config); // setup the connection pool

@@ -65,22 +65,29 @@ public class DatabaseHandler {
 
 	public static void removeOnline(int playerId, int position) throws SQLException {
 		// just going to remove a player from online status
-		Connection conn = DatabaseConnection.getConnection();
-		Statement st = conn.createStatement();
-		st.executeUpdate("UPDATE gameDB.players SET ONLINE = 0 WHERE Id = " + playerId);
-		
-		// if (Player.onlinePlayers.contains(new Player(playerId,"Player2",50,25)));
-		Player.onlinePlayers.remove(position);
-		// cleanup -- important
-		DatabaseConnection.closeStatement(st);
-		DatabaseConnection.closeConnection(conn);
+		try {
+			System.out.println("HELLO1");
+			Connection conn = DatabaseConnection.getConnection();
+			System.out.println("HELLO2");
+			Statement st = conn.createStatement();
+			st.executeUpdate("UPDATE gameDB.players SET Online = 0 WHERE Id = " + playerId);
+			Player.onlinePlayers.remove(position);
+			System.out.println("SIZE IS " + Player.onlinePlayers.size());
+			// cleanup -- important
+			DatabaseConnection.closeStatement(st);
+			DatabaseConnection.closeConnection(conn);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			Thread.dumpStack();
+		}
 	}
 	
 	// update player's coordinates here
 	public static void updateCoordinates(int id, int listPosition, int x, int y) throws SQLException {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
-		st.executeUpdate("UPDATE gameDB.players SET X-Pos = " + x + "Y-Pos = " + y + " WHERE Id = " + id);
+		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE players.Id = " + id);
 		// update in list.. TODO put a lock on the arraylist when threads concurrently use
 		Player.onlinePlayers.get(listPosition).x = x;
 		Player.onlinePlayers.get(listPosition).x = y;

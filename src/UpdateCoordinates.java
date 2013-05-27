@@ -8,9 +8,15 @@ public class UpdateCoordinates {
 		// not actually player's name but infact the listPosition is passed as second parameter
 		while (true) {
 			Player player = (Player) inputStream.readObject();
-			// DB transaction to update player
-			DatabaseHandler.updateCoordinates(player.id, Integer.parseInt(player.name), player.x, player.y);
+			int position = Integer.parseInt(player.name);
 			
+			// DB transaction to update player
+			if (Player.onlinePlayers.size() > position) {
+				DatabaseHandler.updateCoordinates(player.id, position, player.x, player.y);
+			}
+			else {
+				return; // prevent out of bounds
+			}
 		}
 	}
 }

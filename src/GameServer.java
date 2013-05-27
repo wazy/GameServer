@@ -32,33 +32,42 @@ public class GameServer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	GameServer(Socket s, int i) {
+	
+    ObjectInputStream inputStream;
+
+	GameServer(Socket s, int i) throws IOException {
 		this.connection = s;
+        //inputStream = new ObjectInputStream(connection.getInputStream());
 		//this.ID = i;
 	}
 	public void run() {
 		try {
+			// input reader / output writer init
+			//BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
+			//ObjectInputStream ois = new ObjectInputStream(bis);
+
+			BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.flush();
+		    inputStream = new ObjectInputStream(connection.getInputStream());
+			
 			while (true) {
-				// input reader / output writer init
-				BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
-				ObjectOutputStream oos = new ObjectOutputStream(bos);
-				oos.flush();
-				BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				int character;
-				StringBuffer process = new StringBuffer();
-				int id;
 				
-				while((character = ois.readChar()) != 13) {
-					process.append((char)character);
-				}
+				int id;
+				//StringBuffer process = new StringBuffer();
+				
+				System.out.println(inputStream.available());
+				
+				String process = (String) inputStream.readObject();
+			
 				// client wants to authenticate
-				if (process.toString().contentEquals("auth")) {
+				if (process.contentEquals("auth")) {
 					System.out.println("\nauthenticated client");
+					
 					oos.writeInt(1);
 					oos.flush();
 
-					id = ois.readInt();
+					id = inputStream.readInt();
 					// player id, name and x y coordinates (, delimited)
 					// should be from database -- i.e. (1, testuser, 100, 200)
 					System.out.println("Player Id = " + id);
@@ -66,30 +75,28 @@ public class GameServer implements Runnable {
 					// player doesn't exist in DB?
 					if (playerInfo != null) {
 						setPlayerId(id);
-						oos.writeChars(playerInfo + (char) 13);
+						oos.writeObject(playerInfo);
 						oos.flush();
 						// send other players to client
-						// UpdateClient.sendOnlinePlayers(oos);
+						UpdateClient.sendOnlinePlayers(connection, oos);
 					}
 					else {
-						oos.writeChars("create" + (char) 13);
+						oos.writeObject("create");
 						oos.flush();
 					}
-					// oos.close();
-					// ois.close();
 					break;
 				}
 				// client coordinate update thread connected
-				else if (process.toString().contentEquals("update")) {
+				else if (process.contentEquals("update")) {
 					System.out.println("\nauthenticated client");
 					oos.writeInt(1);
 					oos.flush();
 					// send other players to client
-					// UpdateCoordinates.acceptCoordinates(ois);
+					UpdateCoordinates.acceptCoordinates(inputStream);
 				}
 				else {
 					System.out.println("Authentication failure");
-					System.out.println(process.toString());
+					System.out.println(process);
 					oos.writeInt(0);
 					oos.flush();
 					oos.close();

@@ -1,11 +1,13 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Player implements Serializable {
 
 	private static final long serialVersionUID = -8405971951484157839L;
 
-	public static ArrayList<Player> onlinePlayers = new ArrayList<Player>(16);
+	public static List<Player> onlinePlayers = Collections.synchronizedList(new ArrayList<Player>(16));
 	
 	public int id, x, y;
 	public String name;
