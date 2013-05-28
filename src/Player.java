@@ -21,8 +21,8 @@ public class Player implements Serializable {
 	}
 
 	void update(int dx, int dy) {
-		x += dx;
-		y += dy;
+		x = dx;
+		y = dy;
 	}
 
 	@Override

@@ -42,22 +42,15 @@ public class GameServer implements Runnable {
 	}
 	public void run() {
 		try {
-			// input reader / output writer init
-			//BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-			//ObjectInputStream ois = new ObjectInputStream(bis);
-
+			int id;
+			
+			// init output and input streams
 			BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
 			oos.flush();
 		    inputStream = new ObjectInputStream(connection.getInputStream());
 			
 			while (true) {
-				
-				int id;
-				//StringBuffer process = new StringBuffer();
-				
-				System.out.println(inputStream.available());
-				
 				String process = (String) inputStream.readObject();
 			
 				// client wants to authenticate
@@ -91,7 +84,7 @@ public class GameServer implements Runnable {
 					System.out.println("\nauthenticated client");
 					oos.writeInt(1);
 					oos.flush();
-					// send other players to client
+					// send other players to client -- should be own thread
 					UpdateCoordinates.acceptCoordinates(inputStream);
 				}
 				else {
@@ -111,7 +104,7 @@ public class GameServer implements Runnable {
 			try {
 				connection.close();
 				// everyone should be offline at shutdown
-				DatabaseHandler.turnAllOffline();
+				// DatabaseHandler.turnAllOffline();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
