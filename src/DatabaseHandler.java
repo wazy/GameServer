@@ -87,5 +87,7 @@ public class DatabaseHandler {
 		Statement st = conn.createStatement();
 		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE players.Id = " + id);
 		// update in list.. TODO put a lock on the arraylist when threads concurrently use
+		DatabaseConnection.closeStatement(st);
+		DatabaseConnection.closeConnection(conn);
 	}
 }
