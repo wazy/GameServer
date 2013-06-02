@@ -30,8 +30,8 @@ public class UpdateClient {
 				outputStream.writeObject(Player.onlinePlayers);
 				outputStream.flush();
 				
-				// 3 second pause between updates
-				Thread.sleep(3000);
+				// pause between updates
+				Thread.sleep(1000);
 			}
 		}
 		catch (SocketException e) {
