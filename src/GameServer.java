@@ -49,53 +49,49 @@ public class GameServer implements Runnable {
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
 			oos.flush();
 		    inputStream = new ObjectInputStream(connection.getInputStream());
-			
-			while (true) {
-				String process = (String) inputStream.readObject();
-			
-				// client wants to authenticate
-				if (process.contentEquals("auth")) {
-					System.out.println("\nauthenticated client");
-					
-					oos.writeInt(1);
-					oos.flush();
 
-					id = inputStream.readInt();
-					// player id, name and x y coordinates (, delimited)
-					// should be from database -- i.e. (1, testuser, 100, 200)
-					System.out.println("Player Id = " + id);
-					String playerInfo  = DatabaseHandler.queryAuth(id);
-					// player doesn't exist in DB?
-					if (playerInfo != null) {
-						setPlayerId(id);
-						oos.writeObject(playerInfo);
-						oos.flush();
-						// send other players to client
-						UpdateClient.sendOnlinePlayers(connection, oos);
-					}
-					else {
-						oos.writeObject("create");
-						oos.flush();
-					}
-					break;
-				}
-				// client coordinate update thread connected
-				else if (process.contentEquals("update")) {
-					System.out.println("\nauthenticated client");
-					oos.writeInt(1);
-					oos.flush();
-					// send other players to client -- should be own thread
-					UpdateCoordinates.acceptCoordinates(inputStream);
-				}
-				else {
-					System.out.println("Authentication failure");
-					System.out.println(process);
-					oos.writeInt(0);
-					oos.flush();
-					oos.close();
-					break;
-				}
-			}
+		    String process = (String) inputStream.readObject();
+
+		    // client wants to authenticate
+		    if (process.contentEquals("auth")) {
+		    	System.out.println("\nauthenticated client");
+
+		    	oos.writeInt(1);
+		    	oos.flush();
+
+		    	id = inputStream.readInt();
+		    	// player id, name and x y coordinates (, delimited)
+		    	// should be from database -- i.e. (1, testuser, 100, 200)
+		    	System.out.println("Player Id = " + id);
+		    	String playerInfo  = DatabaseHandler.queryAuth(id);
+		    	// player doesn't exist in DB?
+		    	if (playerInfo != null) {
+		    		setPlayerId(id);
+		    		oos.writeObject(playerInfo);
+		    		oos.flush();
+		    		// send other players to client
+		    		UpdateClient.sendOnlinePlayers(connection, oos);
+		    	}
+		    	else {
+		    		oos.writeObject("create");
+		    		oos.flush();
+		    	}
+		    }
+		    // client coordinate update thread connected
+		    else if (process.contentEquals("update")) {
+		    	System.out.println("\nauthenticated client");
+		    	oos.writeInt(1);
+		    	oos.flush();
+		    	// send other players to client -- should be own thread
+		    	UpdateCoordinates.acceptCoordinates(inputStream);
+		    }
+		    else {
+		    	System.out.println("Authentication failure");
+		    	System.out.println(process);
+		    	oos.writeInt(0);
+		    	oos.flush();
+		    	oos.close();
+		    }
 		}
 		catch (Exception e) {
 			e.printStackTrace();
