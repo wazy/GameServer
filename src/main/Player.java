@@ -1,3 +1,4 @@
+package main;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,13 +8,14 @@ public class Player implements Serializable {
 
 	private static final long serialVersionUID = -8405971951484157839L;
 
-	public static List<Player> onlinePlayers = Collections.synchronizedList(new ArrayList<Player>(16));
-	
+	public static List<Player> onlinePlayers = Collections
+			.synchronizedList(new ArrayList<Player>(16));
+
 	public int id, x, y;
 	public String name;
 	public boolean selected = false;
-	
-	Player (int id, String name, int x, int y) {
+
+	Player(int id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
