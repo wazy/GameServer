@@ -1,12 +1,11 @@
 package main;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 
 public class SendPlayerCoordinates {
-	public static void sendOnlinePlayers(Socket socket, ObjectOutputStream outputStream) throws InterruptedException, SQLException {
+	public static void sendOnlinePlayers(ObjectOutputStream outputStream) throws InterruptedException, SQLException {
 		int id = GameServer.getPlayerId(), position = 0;
 		System.out.println("Sending player coordinates..");
 		try {
@@ -34,15 +33,12 @@ public class SendPlayerCoordinates {
 				// pause between updates
 				Thread.sleep(1000);
 			}
-		} catch (SocketException e) {
-			try {
-				// throws socket exception indicating closed/lost connection
-				// from client
-				System.out.println("\nPlayer " + id + " has disconnected.");
-			} catch (Exception e1) {
-			}
-		} catch (IOException ioe) {
-		} finally {
+		} 
+		catch (SocketException e) {
+		} 
+		catch (IOException ioe) {
+		} 
+		finally {
 			DatabaseHandler.removeOnline(id, position);
 		}
 	}

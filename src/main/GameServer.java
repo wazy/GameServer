@@ -2,7 +2,6 @@ package main;
 import java.io.*;
 import java.net.*;
 
-// (char) 13 is used to end read writes
 public class GameServer implements Runnable {
 
 	private Socket connection;
@@ -43,66 +42,75 @@ public class GameServer implements Runnable {
 
 	public void run() {
 		try {
-			int id;
-
 			// init output and input streams
-			BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.flush(); // don't forget to flush ;-)
+			ObjectOutputStream outputStream = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+			outputStream.flush(); // don't forget to flush ;-)
 			inputStream = new ObjectInputStream(connection.getInputStream());
 
 			String process = (String) inputStream.readObject();
 
-			// client wants to authenticate
+			// client wants to authenticate, auth packet as follows
+			// CMSG "auth", SMSG 1, CMSG username,
+			// SMSG 1 or 0 (exists or doesn't), CMSG 1 (pong if user exists),
+			// SMSG passwordHash --> then server d/c's the client
 			if (process.contentEquals("auth")) {
-				System.out.println("\nAuthenticated client!");
 
-				oos.writeInt(1);
-				oos.flush();
+				outputStream.writeInt(1);
+				outputStream.flush();
 
-				id = inputStream.readInt();
-				// player id, name and x y coordinates (, delimited)
-				// should be from database -- i.e. (1, testuser, 100, 200)
-				System.out.println("Player Id = " + id);
-				String playerInfo = DatabaseHandler.queryAuth(id);
-				
-				// player exists --> send info
-				if (playerInfo != null) {
-					setPlayerId(id);
-					oos.writeObject(playerInfo);
-					oos.flush();
+				String username = (String) inputStream.readObject();
+
+				String passwordHash = DatabaseHandler.queryAuth(username);
+				if (passwordHash != null) {
+					outputStream.writeInt(1); // ping
+					outputStream.flush();
+					inputStream.readInt(); // pong
+					outputStream.writeObject(passwordHash); // write passwordHash
+					outputStream.flush();
+
+					inputStream.close();
+					outputStream.close();
+
+					System.out.println("\nAuthenticated client!");
+				}
+				else { // user does not exist
+					outputStream.writeInt(0);
+					outputStream.flush();
+
+					inputStream.close();
+					outputStream.close();
 					
-					// send other online players to client (one shot)
-					// routine update is handled by another (thread) connection
-					SendPlayerCoordinates.sendOnlinePlayers(connection, oos);
+					System.out.println("\nRejected client!");
 				}
-				// player doesn't exist in DB
-				else {
-					oos.writeObject("create");
-					oos.flush();
-				}
+			}
+			// to send player coordinates
+			else if (process.contentEquals("spc")) {
+				outputStream.writeInt(1);
+				outputStream.flush();	
+				// send other online players to client
+				SendPlayerCoordinates.sendOnlinePlayers(outputStream);
 			}
 			// client coordinate update thread connected
 			else if (process.contentEquals("update")) {
-				oos.writeInt(1);
-				oos.flush();
+				outputStream.writeInt(1);
+				outputStream.flush();
 				// send other players to client -- for great justice!
 				AcceptPlayerCoordinates.acceptCoordinates(inputStream);
 			}
 			// NYI.. this is placeholder
 			else if (process.contentEquals("monster")) {
-				oos.writeInt(1);
-				oos.flush();
+				outputStream.writeInt(1);
+				outputStream.flush();
 				// send & receive updates for monsters here 
-				CreatureHandler.updateClient(oos, inputStream);
+				CreatureHandler.updateClient(outputStream, inputStream);
 			}
 			// this shouldn't happen.. but if it does?
 			else {
 				System.out.println("Authentication failure!");
 				System.out.println(process);
-				oos.writeInt(0);
-				oos.flush();
-				oos.close();
+				outputStream.writeInt(0);
+				outputStream.flush();
+				outputStream.close();
 			}
 		}
 		catch (Exception e) {

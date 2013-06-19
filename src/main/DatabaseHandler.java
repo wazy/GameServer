@@ -5,25 +5,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseHandler {
-	// TODO Probably remove this.. ingenious method of adding when they actually
-	// log in
-	// that prevents unnecessary overhead in queryAuth()
+	// will be a server console command
 	public static void queryOnline() throws SQLException {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 
-		ResultSet rst = st
-				.executeQuery("Select * from players where online = 1;");
+		ResultSet rst = st.executeQuery("Select * from players where online = 1;");
 
 		/* id, name, level, class, x-pos, y-pos, online */
 		while (rst.next()) {
-			// add online players
-			Player.onlinePlayers.add(new Player(rst.getInt(1),
-					rst.getString(2), rst.getInt(5), rst.getInt(6)));
-			System.out.println("Online Players: " + rst.getString(2));
+			System.out.println(rst.getString(1));
 		}
 
-		// cleanup
+		// cleanup connection
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeResultSet(rst);
 		DatabaseConnection.closeConnection(conn);
@@ -40,32 +34,37 @@ public class DatabaseHandler {
 		DatabaseConnection.closeConnection(conn);
 	}
 
-	public static String queryAuth(int id) {
+	public static String queryAuth(String username) {
 		try {
-			String player = null;
+			String passwordHash = null;
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			ResultSet rst = st
-					.executeQuery("SELECT * FROM gameDB.players WHERE Id = "
-							+ id);
-			/* id, name, level, class, x-pos, y-pos, online */
-			while (rst.next()) {
-				// return online player
-				Player.onlinePlayers.add(new Player(rst.getInt(1), rst
-						.getString(2), rst.getInt(5), rst.getInt(6)));
-				System.out.println(rst.getString(2) + " is now online!");
-				player = rst.getInt(1) + ", " + rst.getString(2) + ", "
-						+ rst.getInt(5) + ", " + rst.getInt(6);
+			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.account WHERE Username = '" + username + "'");
+			
+			/* ID, Username, Password (Hashed) */
+			if (rst.next()) {
+				int ID = rst.getInt("ID");
+				passwordHash = rst.getString("Password");
+				
+				/* id, name, level, class, x-pos, y-pos, online */
+				rst = st.executeQuery("SELECT * FROM gameDB.players WHERE Id = " + ID);
+				if (rst.next()) {
+					// return online player
+					Player.onlinePlayers.add(new Player(rst.getInt(1), rst.getString(2), rst.getInt(5), rst.getInt(6)));
+					System.out.println(rst.getString(2) + " is now online!");
+					// player = rst.getInt(1) + ", " + rst.getString(2) + ", "+ rst.getInt(5) + ", " + rst.getInt(6);
+				}
+				st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE Id = " + ID);
+				GameServer.setPlayerId(ID);	// needed for other threads.. not safe nor good implementation TODO: fixme
 			}
-			st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE Id = "
-					+ id);
 			// cleanup
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeResultSet(rst);
 			DatabaseConnection.closeConnection(conn);
 
-			return player;
-		} catch (Exception e) {
+			return passwordHash;
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
