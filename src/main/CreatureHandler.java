@@ -10,13 +10,14 @@ public class CreatureHandler {
 		System.out.println("Creature thread started..");
 		// this will terminate client after 16 seconds (testing at the moment)
 		try {
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < 1; i++) {
 				Creature.CreatureList.add(new Creature(i, "Monster", i*20, i*20, i));
 				outputStream.flush();
 				outputStream.writeObject(Creature.CreatureList);
 				outputStream.flush();
 				Thread.sleep(1000);
 			}
+			Thread.sleep(30000);
 			outputStream.close();
 			inputStream.close();
 		}
