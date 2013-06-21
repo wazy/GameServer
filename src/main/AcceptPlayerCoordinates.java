@@ -18,9 +18,9 @@ public class AcceptPlayerCoordinates {
 
 				// DB transaction to update player
 				if (Player.onlinePlayers.size() > position) {
-					Player.onlinePlayers.get(position).update(player.x, player.y);
+					Player.onlinePlayers.get(position).update(player.getX(), player.getY());
 					if (counter >= 100) { // DB transaction is more costly -- do it infrequently
-						DatabaseHandler.updateCoordinates(player.id, player.x, player.y);
+						DatabaseHandler.updateCoordinates(player.getId(), player.getX(), player.getY());
 						counter = 0;
 					}
 					// System.out.println("Processed coordinates = " + player.x + "  " + player.y);

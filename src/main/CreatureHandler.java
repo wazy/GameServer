@@ -8,18 +8,18 @@ public class CreatureHandler {
 	public static void updateClient(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException {
 		// TODO further implement this..
 		System.out.println("Creature thread started..");
-		// this will terminate client after 16 seconds (testing at the moment)
+		
 		try {
-			for (int i = 0; i < 1; i++) {
-				Creature.CreatureList.add(new Creature(i, "Monster", i*20, i*20, i));
-				outputStream.flush();
+			Creature.CreatureList.add(new Creature(1, "Monster", 100, 100, 1));
+			while (true) {
+				//Creature.CreatureList.get(0).x = Creature.CreatureList.get(0).x + 10;
+				//Creature.CreatureList.get(0).y = Creature.CreatureList.get(0).y + 10;
+				
+				outputStream.reset();
 				outputStream.writeObject(Creature.CreatureList);
 				outputStream.flush();
 				Thread.sleep(1000);
 			}
-			Thread.sleep(30000);
-			outputStream.close();
-			inputStream.close();
 		}
 		// silence error from client closing socket
 		catch (Exception e) {

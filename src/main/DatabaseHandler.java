@@ -28,7 +28,7 @@ public class DatabaseHandler {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 
-		st.executeUpdate("UPDATE gameDB.players SET ONLINE = 0 WHERE 1=1");
+		st.executeUpdate("UPDATE gameDB.players SET ONLINE = 0 WHERE 1");
 		// cleanup
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);
@@ -76,28 +76,26 @@ public class DatabaseHandler {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			st.executeUpdate("UPDATE gameDB.players SET Online = 0 WHERE Id = "
-					+ playerId);
+			st.executeUpdate("UPDATE gameDB.players SET Online = 0 WHERE Id = " + playerId);
 			Player.onlinePlayers.remove(position);
 			// cleanup -- important
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeConnection(conn);
-			System.out.println("Player " + playerId + " is now offline.");
-		} catch (Exception e) {
+			System.out.println("\nPlayer " + playerId + " is now offline.");
+		} 
+		catch (Exception e) {
+			System.out.println("Player " + playerId + "could not be set to offline.");
 			e.printStackTrace();
-			Thread.dumpStack();
 		}
 	}
 
 	// update player's coordinates here
-	public static void updateCoordinates(int id, int x, int y)
-			throws SQLException {
+	public static void updateCoordinates(int id, int x, int y) throws SQLException {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
-		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", "
-				+ "`Y-Pos` = " + y + " WHERE players.Id = " + id);
-		// update in list.. TODO put a lock on the arraylist when threads
-		// concurrently use
+		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE players.Id = " + id);
+		
+		// cleanup
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);
 	}
