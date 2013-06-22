@@ -39,13 +39,13 @@ public class DatabaseHandler {
 			String passwordHash = null;
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.account WHERE Username = '" + username + "'");
-			
+			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.accounts WHERE Username = '" + username + "'");
+
 			/* ID, Username, Password (Hashed) */
 			if (rst.next()) {
 				int ID = rst.getInt("ID");
 				passwordHash = rst.getString("Password");
-				
+
 				/* id, name, level, class, x-pos, y-pos, online */
 				rst = st.executeQuery("SELECT * FROM gameDB.players WHERE Id = " + ID);
 				if (rst.next()) {
@@ -94,9 +94,39 @@ public class DatabaseHandler {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE players.Id = " + id);
-		
+
 		// cleanup
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);
+	}
+
+	public static boolean addAccount(String[] accountDetails) {
+		try { // try to add an account here from username and password hash
+			String username = accountDetails[0];
+			String hashpw = accountDetails[1];
+
+			Connection conn = DatabaseConnection.getConnection();
+			Statement st = conn.createStatement();
+
+			/* ID, Username, Password (Hashed) */
+			st.executeUpdate("INSERT INTO `accounts` (`Username`, `Password`) VALUES (" +
+					"'" + username + "', '" + hashpw + "');");
+
+			/* id, name, level, class, x-pos, y-pos, online */
+			st.executeUpdate("INSERT INTO `players`" + "(`Name`, `Level`, `Class`, `X-Pos`," 
+					+ "`Y-Pos`, `Online`) VALUES ('" + username + "', 1, 'Rog', 0, 0, 0);");
+
+			// cleanup
+			DatabaseConnection.closeStatement(st);
+			DatabaseConnection.closeConnection(conn);
+
+			return true;
+		}
+		// this will throw duplicate errors because of Unique constraint
+		// just silence the error and red text and tell client it can't continue
+		catch (SQLException e) {
+			// e.printStackTrace();
+			return false;
+		}
 	}
 }

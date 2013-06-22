@@ -32,8 +32,6 @@ public class GameServer implements Runnable {
 		}
 	}
 
-	ObjectInputStream inputStream;
-
 	GameServer(Socket s, int i) throws IOException {
 		this.connection = s;
 		// inputStream = new ObjectInputStream(connection.getInputStream());
@@ -45,7 +43,7 @@ public class GameServer implements Runnable {
 			// init output and input streams
 			ObjectOutputStream outputStream = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 			outputStream.flush(); // don't forget to flush ;-)
-			inputStream = new ObjectInputStream(connection.getInputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(connection.getInputStream());
 
 			String process = (String) inputStream.readObject();
 
@@ -83,6 +81,40 @@ public class GameServer implements Runnable {
 					System.out.println("\nRejected client!");
 				}
 			}
+
+			// registering a client account here
+			// client wants to register, reg packet as follows
+			// CMSG "register", SMSG 1, CMSG regDetails,
+			// SMSG 1 or 0 (valid or not) --> then server d/c's the client
+			else if (process.contentEquals("register")) {
+				outputStream.writeInt(1);
+				outputStream.flush();
+
+				String regDetails = (String) inputStream.readObject();
+				String[] accountDetails = regDetails.split(" ");
+				
+				boolean success = DatabaseHandler.addAccount(accountDetails);
+				
+				if (success) { // account created
+					outputStream.writeInt(1);
+					outputStream.flush();
+					
+					inputStream.close();
+					outputStream.close();
+
+					System.out.println("\nRegistered account name: " + accountDetails[0]);
+				}
+				else { // account not created
+					outputStream.writeInt(0);
+					outputStream.flush();
+
+					inputStream.close();
+					outputStream.close();
+					
+					System.out.println("\nRejected account name: " + accountDetails[0]);
+				}
+			}
+			
 			// to send player coordinates
 			else if (process.contentEquals("spc")) {
 				outputStream.writeInt(1);
