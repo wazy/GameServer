@@ -5,6 +5,8 @@ import java.net.SocketException;
 import java.sql.SQLException;
 
 public class AcceptPlayerCoordinates {
+	//public static volatile boolean Running = false;
+	
 	public static void acceptCoordinates(ObjectInputStream inputStream) throws SQLException, ClassNotFoundException {
 		System.out.println("Accepting player coordinates..");
 		try {
@@ -16,8 +18,9 @@ public class AcceptPlayerCoordinates {
 				int position = Integer.parseInt(player.getName());
 				// System.out.println("Received updates from client..");
 
+
 				synchronized (Player.onlinePlayers) {
-					// DB transaction to update player
+				// DB transaction to update player
 					if (Player.onlinePlayers.size() > position) {
 						Player.onlinePlayers.get(position).update(player.getX(), player.getY());
 						if (counter >= 100) { // DB transaction is more costly -- do it infrequently
@@ -27,7 +30,7 @@ public class AcceptPlayerCoordinates {
 						counter++;
 					}
 					else if (Player.onlinePlayers.get(position-1).getId() == player.getId()) {
-						Player.onlinePlayers.get(position).update(player.getX(), player.getY());
+						Player.onlinePlayers.get(position-1).update(player.getX(), player.getY());
 						if (counter >= 100) { // DB transaction is more costly -- do it infrequently
 							DatabaseHandler.updateCoordinates(player.getId(), player.getX(), player.getY());
 							counter = 0;
@@ -35,6 +38,7 @@ public class AcceptPlayerCoordinates {
 						counter++;
 					}
 					else {
+						System.out.println(Player.onlinePlayers.get(position-1).getId() + " " + player.getId());
 						System.out.println("OUT OF BOUNDS! Position: " + position + " List size: " + Player.onlinePlayers.size());
 						return; // prevent out of bounds (player index not in list or moved)
 					}
