@@ -5,18 +5,29 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseHandler {
-	// will be a server console command
+	// server console command
 	public static void queryOnline() throws SQLException {
+		int counter = 0;
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 
 		ResultSet rst = st.executeQuery("Select * from players where online = 1;");
 
+		System.out.print("{ ");
+		
 		/* id, name, level, class, x-pos, y-pos, online */
 		while (rst.next()) {
-			System.out.println(rst.getString(1));
+			System.out.print(rst.getString(2) + " ");
+			counter++;
 		}
 
+		// no online players
+		if (counter == 0) {
+			System.out.print("NONE ");
+		}
+		
+		System.out.print("}");
+		
 		// cleanup connection
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeResultSet(rst);
@@ -34,41 +45,63 @@ public class DatabaseHandler {
 		DatabaseConnection.closeConnection(conn);
 	}
 
-	public static String queryAuth(String username) {
+	public static String[] queryAuth(String username) {
 		try {
-			String passwordHash = null;
+			int ID = 0;
+			String[] userInfo = new String[6];
+			
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
 			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.accounts WHERE Username = '" + username + "'");
 
 			/* ID, Username, Password (Hashed) */
 			if (rst.next()) {
-				int ID = rst.getInt("ID");
-				passwordHash = rst.getString("Password");
+				ID = rst.getInt("ID");
+				userInfo[0] = String.valueOf(ID);
+				userInfo[1] = rst.getString("Password");
 
 				/* id, name, level, class, x-pos, y-pos, online */
 				rst = st.executeQuery("SELECT * FROM gameDB.players WHERE Id = " + ID);
+
+				// return online player
 				if (rst.next()) {
-					// return online player
-					Player.onlinePlayers.add(new Player(rst.getInt(1), rst.getString(2), rst.getInt(5), rst.getInt(6)));
-					System.out.println(rst.getString(2) + " is now online!");
-					// player = rst.getInt(1) + ", " + rst.getString(2) + ", "+ rst.getInt(5) + ", " + rst.getInt(6);
+					userInfo[2] = rst.getString(2);
+					userInfo[3] = String.valueOf(rst.getInt(5));
+					userInfo[4] = String.valueOf(rst.getInt(6));
 				}
-				st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE Id = " + ID);
-				GameServer.setPlayerId(ID);	// needed for other threads.. not safe nor good implementation TODO: fixme
 			}
+
 			// cleanup
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeResultSet(rst);
 			DatabaseConnection.closeConnection(conn);
 
-			return passwordHash;
+			return userInfo;
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
+
+	public static void turnOnline(int ID, Player player) {
+		try {
+			Connection conn = DatabaseConnection.getConnection();
+			Statement st = conn.createStatement();
+
+			Player.onlinePlayers.add(player);
+			System.out.println(player.getName() + " is now online!");
+			st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE Id = " + ID);
+			GameServer.setPlayerId(ID);	// needed for other threads.. not safe nor good implementation TODO: fixme
+
+			DatabaseConnection.closeStatement(st);
+			DatabaseConnection.closeConnection(conn);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	public static void removeOnline(int playerId, int position)
 			throws SQLException {

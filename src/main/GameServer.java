@@ -19,6 +19,11 @@ public class GameServer implements Runnable {
 			// everyone should be offline at startup
 			DatabaseHandler.turnAllOffline();
 
+			// start thread that reads console input here
+			Runnable loggerRunnable = new ConsoleLogger();
+			Thread loggerThread = new Thread(loggerRunnable);
+			loggerThread.start();
+			
 			System.out.println("GameServer initialized.. have fun!");
 			while (true) {
 				Socket connection = socket.accept();
@@ -50,7 +55,8 @@ public class GameServer implements Runnable {
 			// client wants to authenticate, auth packet as follows
 			// CMSG "auth", SMSG 1, CMSG username,
 			// SMSG 1 or 0 (exists or doesn't), CMSG 1 (pong if user exists),
-			// SMSG passwordHash --> then server d/c's the client
+			// SMSG passwordHash, CMSG 1 or 0 (valid or not)
+			// --> then server d/c's the client		
 			if (process.contentEquals("auth")) {
 
 				outputStream.writeInt(1);
@@ -58,18 +64,28 @@ public class GameServer implements Runnable {
 
 				String username = (String) inputStream.readObject();
 
-				String passwordHash = DatabaseHandler.queryAuth(username);
-				if (passwordHash != null) {
+				String[] userInfoArr = DatabaseHandler.queryAuth(username);
+				if (userInfoArr[1] != null) { // password not null (means exists)
 					outputStream.writeInt(1); // ping
 					outputStream.flush();
 					inputStream.readInt(); // pong
-					outputStream.writeObject(passwordHash); // write passwordHash
+					outputStream.writeObject(userInfoArr[1]); // write passwordHash
 					outputStream.flush();
+					
+					int valid = inputStream.readInt(); // client matched password
+					
+					if (valid == 1) { // let's add to list and turn online
+						Player player = new Player(Integer.parseInt(userInfoArr[0]), userInfoArr[2], 
+													Integer.parseInt(userInfoArr[3]), Integer.parseInt(userInfoArr[4]));
+						
+						/* Player =  ID, name, x, y */
+						DatabaseHandler.turnOnline(Integer.parseInt(userInfoArr[0]), player); // ID, Player object
 
+						System.out.println("\nAuthenticated client!");
+					}
+					
 					inputStream.close();
 					outputStream.close();
-
-					System.out.println("\nAuthenticated client!");
 				}
 				else { // user does not exist
 					outputStream.writeInt(0);
@@ -78,7 +94,7 @@ public class GameServer implements Runnable {
 					inputStream.close();
 					outputStream.close();
 					
-					System.out.println("\nRejected client!");
+					System.out.println("\nRejected non-existing user who attempted to auth!");
 				}
 			}
 
