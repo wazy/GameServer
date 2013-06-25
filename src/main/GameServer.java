@@ -18,13 +18,18 @@ public class GameServer implements Runnable {
 
 			// everyone should be offline at startup
 			DatabaseHandler.turnAllOffline();
-
+			
+			// handling randomizing creature movements here
+			Runnable creatureRunnable = new CreatureHandler();
+			Thread creatureThread = new Thread(creatureRunnable);
+			creatureThread.start();
+			
 			// start thread that reads console input here
 			Runnable loggerRunnable = new ConsoleLogger();
 			Thread loggerThread = new Thread(loggerRunnable);
 			loggerThread.start();
 			
-			System.out.println("GameServer initialized.. have fun!");
+			System.out.println("\nGameServer initialized.. have fun!");
 			while (true) {
 				Socket connection = socket.accept();
 				Runnable runnable = new GameServer(connection, ++count);
@@ -150,7 +155,7 @@ public class GameServer implements Runnable {
 				outputStream.writeInt(1);
 				outputStream.flush();
 				// send & receive updates for monsters here 
-				CreatureHandler.updateClient(outputStream, inputStream);
+				SendCreatureCoordinates.updateClient(outputStream, inputStream);
 			}
 			// this shouldn't happen.. but if it does?
 			else {

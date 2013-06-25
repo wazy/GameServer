@@ -1,29 +1,40 @@
 package main;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.util.Random;
 
-public class CreatureHandler {
-	public static void updateClient(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException {
+public class CreatureHandler implements Runnable {
+	public void run() {
 		// TODO further implement this..
-		System.out.println("Creature thread started..");
-		
+		System.out.println("Creature handler thread started..");
+
 		try {
-			Creature.CreatureList.add(new Creature(1, "Monster", 100, 100, 1));
+			Random rand = new Random();
+			
+			DatabaseHandler.queryCreatures();
+
 			while (true) {
-				//Creature.CreatureList.get(0).x = Creature.CreatureList.get(0).x + 10;
-				//Creature.CreatureList.get(0).y = Creature.CreatureList.get(0).y + 10;
-				
-				outputStream.reset();
-				outputStream.writeObject(Creature.CreatureList);
-				outputStream.flush();
-				Thread.sleep(1000);
+				for (int i = 0; i < Creature.creatureList.size(); i++) {
+					Creature creature = Creature.creatureList.get(i);
+
+					int x = creature.getX();
+					int y = creature.getY();
+
+					// out of bounds of screen -- reset creature
+					if (x > 640 || y > 480 || x < 0 || y < 0) {
+						creature.setX(rand.nextInt(641)); // rand.nextInt(max - min + 1) + min;
+						creature.setY(rand.nextInt(481));
+					}
+					else {
+						creature.setX(x + rand.nextInt(50) - 25); // -25 to 25
+						creature.setY(y + rand.nextInt(50) - 25);
+					}
+				}
+				Thread.sleep(200);
 			}
 		}
-		// silence error from client closing socket
+		// shouldn't error here
 		catch (Exception e) {
-			return;
+			e.printStackTrace();
 		}
 	}
 }

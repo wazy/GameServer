@@ -11,18 +11,18 @@ public class ConsoleLogger implements Runnable {
 		try {
 			while (true) {
 				System.out.print(">>> ");
-				// System.out.println(scanner.next());
+				// not ready to read anything yet
 				while (!br.ready()) {
-					//System.out.println("blocked.");
+					Thread.sleep(200);
 				}
 				String command;
 				command = br.readLine();
 
 				if (command.equals("commands") || command.equals("help")) {
-					System.out.println("This command really isn't implemented but you can type in 'shutdown'.");
+					System.out.println("Available commands are: {'online', 'shutdown', 'help', 'commands'}.");
 				}
 				else if (command.equals("shutdown")) {
-					System.out.println("Console shutdown imminent!!!");
+					System.out.println("\n!!!Console shutdown imminent!!!");
 					System.exit(0);
 				}
 				else if (command.equals("online")) {
@@ -30,8 +30,11 @@ public class ConsoleLogger implements Runnable {
 					DatabaseHandler.queryOnline();
 					System.out.print("\n");
 				}
-				else {
+				else if (command.isEmpty()) {
 					continue;
+				}
+				else {
+					System.out.println("Unrecognized command. Try typing 'help'.");
 				}
 			}
 		}

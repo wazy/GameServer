@@ -14,7 +14,7 @@ public class DatabaseHandler {
 		ResultSet rst = st.executeQuery("Select * from players where online = 1;");
 
 		System.out.print("{ ");
-		
+
 		/* id, name, level, class, x-pos, y-pos, online */
 		while (rst.next()) {
 			System.out.print(rst.getString(2) + " ");
@@ -25,9 +25,9 @@ public class DatabaseHandler {
 		if (counter == 0) {
 			System.out.print("NONE ");
 		}
-		
+
 		System.out.print("}");
-		
+
 		// cleanup connection
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeResultSet(rst);
@@ -49,7 +49,7 @@ public class DatabaseHandler {
 		try {
 			int ID = 0;
 			String[] userInfo = new String[6];
-			
+
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
 			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.accounts WHERE Username = '" + username + "'");
@@ -160,6 +160,31 @@ public class DatabaseHandler {
 		catch (SQLException e) {
 			// e.printStackTrace();
 			return false;
+		}
+	}
+
+	/* add all the creature spawns to send to clients */
+	public static void queryCreatures() {
+		try {
+			Connection conn = DatabaseConnection.getConnection();
+			Statement st = conn.createStatement();
+			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.creature_spawns;");
+
+			/* GUID, Name, X-Pos, Y-Pos, Faction */
+			while (rst.next()) {
+				Creature creature = new Creature(rst.getInt("GUID"), rst.getString("Name"), 
+										rst.getInt("X-Pos"), rst.getInt("Y-Pos"), rst.getInt("Faction"));
+
+				Creature.creatureList.add(creature);
+			}
+
+			// cleanup
+			DatabaseConnection.closeStatement(st);
+			DatabaseConnection.closeResultSet(rst);
+			DatabaseConnection.closeConnection(conn);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

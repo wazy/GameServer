@@ -10,7 +10,7 @@ public class Creature implements Serializable {
 
 	public static int creatureID = 0;
 
-	public static List<Creature> CreatureList = Collections.synchronizedList(new ArrayList<Creature>(16));
+	public static List<Creature> creatureList = Collections.synchronizedList(new ArrayList<Creature>(16));
 	public static int listPosition = 0; // client's position in the list init to zero
 	public int id, x, y, alliance;
 	public String name;
@@ -29,6 +29,22 @@ public class Creature implements Serializable {
 			return true;
 		else
 			return false;
+	}
+	
+	public int getX() {
+		return this.x;
+	}
+	
+	public void setX(int X) {
+		this.x = X;
+	}
+	
+	public int getY() {
+		return this.y;
+	}
+	
+	public void setY(int Y) {
+		this.y = Y;
 	}
 	
 	public static void setId(String creatureID) {
