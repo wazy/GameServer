@@ -4,5 +4,6 @@
 *.war
 *.ear
 
-*.txt
+/conf/config.conf
+
 /bin

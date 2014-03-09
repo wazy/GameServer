@@ -7,6 +7,8 @@ public class GameServer implements Runnable {
 	private Socket connection;
 	// private int ID;
 	private static int playerId;
+	
+	private static ServerSocket socket = null;
 
 	public static void main(String[] args) {
 		int port = 8149;
@@ -14,9 +16,9 @@ public class GameServer implements Runnable {
 		try {
 			// init everything
 			DatabaseConnection.initConnectionPool();
-			ServerSocket socket = new ServerSocket(port);
+			socket = new ServerSocket(port);
 
-			// everyone should be offline at startup
+			// all players should be offline at startup
 			DatabaseHandler.turnAllOffline();
 			
 			// handling randomizing creature movements here
@@ -38,6 +40,11 @@ public class GameServer implements Runnable {
 			}
 		} 
 		catch (Exception e) {
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}

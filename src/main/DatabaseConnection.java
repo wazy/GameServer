@@ -15,13 +15,13 @@ public class DatabaseConnection {
 	public static void initConnectionPool() {
 		try {
 			Properties prop = new Properties();
-			prop.load(new FileInputStream("config.txt"));
+			prop.load(new FileInputStream("conf/config.conf"));
 			Class.forName("com.mysql.jdbc.Driver"); // also you need the MySQL
 													// driver
 			BoneCPConfig config = new BoneCPConfig();
-			config.setJdbcUrl(prop.getProperty("database"));
-			config.setUsername(prop.getProperty("dbuser"));
-			config.setPassword(prop.getProperty("dbpassword"));
+			config.setJdbcUrl(prop.getProperty("db_info"));
+			config.setUsername(prop.getProperty("db_user"));
+			config.setPassword(prop.getProperty("db_password"));
 			config.setMinConnectionsPerPartition(3);
 			config.setMaxConnectionsPerPartition(5);
 			config.setPartitionCount(1); // 1*2 = 2 connections
