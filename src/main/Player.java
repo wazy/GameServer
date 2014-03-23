@@ -8,7 +8,8 @@ public class Player implements Serializable {
 
 	private static final long serialVersionUID = -8405971951484157839L;
 
-	public static List<Player> onlinePlayers = Collections.synchronizedList(new ArrayList<Player>(16));
+	public static List<Player> onlinePlayers = Collections.synchronizedList(
+													new ArrayList<Player>(16));
 
 	public int id, x, y;
 	public String name;
@@ -34,11 +35,11 @@ public class Player implements Serializable {
 		return this.y;
 	}
 
-	public void setId(int newID) {
+	public void setID(int newID) {
 		this.id = newID;
 	}
 
-	public int getId() {
+	public int getID() {
 		return this.id;
 	}
 
@@ -51,12 +52,12 @@ public class Player implements Serializable {
 	}
 
 
-	public static int getPosition(int clientId) {
+	public static int getPosition(int clientID) {
 		// absolutely necessary to synchronize when we iterate over collection
 		synchronized (Player.onlinePlayers) { 
 			// what position is the player currently at in the list
 			for (int i = 0; i < Player.onlinePlayers.size(); i++) {
-				if (Player.onlinePlayers.get(i).getId() == clientId) {
+				if (Player.onlinePlayers.get(i).getID() == clientID) {
 					return i;
 				}
 			}

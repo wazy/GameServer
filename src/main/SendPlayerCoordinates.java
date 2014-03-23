@@ -1,29 +1,22 @@
 package main;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.SocketException;
 import java.sql.SQLException;
 
 public class SendPlayerCoordinates {
-	public static void sendOnlinePlayers(ObjectOutputStream outputStream) throws InterruptedException, SQLException {
-		int id = GameServer.getPlayerId(), position = 0;
-		System.out.println("Sending player coordinates..");
+	public static void sendOnlinePlayers(ObjectInputStream inputStream, ObjectOutputStream outputStream,
+												int playerID) throws InterruptedException, SQLException {
+
+		System.out.println("Sending player coordinates...");
+
+		int position = -1;
+
 		try {
 			while (true) {
-				position = Player.getPosition(id);
-				// player has to actually be in the ArrayList
-				if (position < 0) {
-					System.exit(1); // should never get here
-				}
-				/* DEBUG INFO:
-				 * System.out.println("Player ID: " + id + " is at position: " +
-				 * position);
-				 * System.out.println(Player.onlinePlayers.get(position).x);
-				 * System.out.println(Player.onlinePlayers.get(position).y);
-				 */
-				// write player position in list to client
-				outputStream.writeInt(position);
-				outputStream.flush();
+
+				position = inputStream.read();
 
 				// reset so we don't write cached players
 				outputStream.reset();
@@ -39,7 +32,8 @@ public class SendPlayerCoordinates {
 		catch (IOException ioe) {
 		} 
 		finally {
-			DatabaseHandler.removeOnline(id, position);
+			if (position >= 0)
+				DatabaseHandler.removeOnline(playerID, position);
 		}
 	}
 }

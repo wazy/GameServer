@@ -6,12 +6,12 @@ import java.sql.Statement;
 
 public class DatabaseHandler {
 	// server console command
-	public static void queryOnline() throws SQLException {
+	public static void queryWhoIsOnline() throws SQLException {
 		int counter = 0;
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 
-		ResultSet rst = st.executeQuery("Select * from players where online = 1;");
+		ResultSet rst = st.executeQuery("SELECT * FROM players WHERE Online = 1;");
 
 		System.out.print("{ ");
 
@@ -39,7 +39,7 @@ public class DatabaseHandler {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
 
-		st.executeUpdate("UPDATE gameDB.players SET ONLINE = 0 WHERE 1");
+		st.executeUpdate("UPDATE players SET Online = 0 WHERE 1");
 		// cleanup
 		DatabaseConnection.closeStatement(st);
 		DatabaseConnection.closeConnection(conn);
@@ -52,7 +52,7 @@ public class DatabaseHandler {
 
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.accounts WHERE Username = '" + username + "'");
+			ResultSet rst = st.executeQuery("SELECT * FROM accounts WHERE Username = '" + username + "'");
 
 			/* ID, Username, Password (Hashed) */
 			if (rst.next()) {
@@ -61,13 +61,15 @@ public class DatabaseHandler {
 				userInfo[1] = rst.getString("Password");
 
 				/* id, name, level, class, x-pos, y-pos, online */
-				rst = st.executeQuery("SELECT * FROM gameDB.players WHERE Id = " + ID);
+				rst = st.executeQuery("SELECT * FROM players WHERE ID = " + ID);
 
+				System.out.println(ID);
+				
 				// return online player
 				if (rst.next()) {
-					userInfo[2] = rst.getString(2);
-					userInfo[3] = String.valueOf(rst.getInt(5));
-					userInfo[4] = String.valueOf(rst.getInt(6));
+					userInfo[2] = rst.getString(2);			     // name
+					userInfo[3] = String.valueOf(rst.getInt(5)); // x-pos
+					userInfo[4] = String.valueOf(rst.getInt(6)); // y-pos
 				}
 			}
 
@@ -91,8 +93,7 @@ public class DatabaseHandler {
 
 			Player.onlinePlayers.add(player);
 			System.out.println(player.getName() + " is now online!");
-			st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE Id = " + ID);
-			GameServer.setPlayerId(ID);	// needed for other threads.. not safe nor good implementation TODO: fixme
+			st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE ID = " + ID);
 
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeConnection(conn);
@@ -103,21 +104,24 @@ public class DatabaseHandler {
 	}
 
 
-	public static void removeOnline(int playerId, int position)
+	public static void removeOnline(int playerID, int position)
 			throws SQLException {
 		// just going to remove a player from online status
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			st.executeUpdate("UPDATE gameDB.players SET Online = 0 WHERE Id = " + playerId);
-			Player.onlinePlayers.remove(position);
+			st.executeUpdate("UPDATE players SET Online = 0 WHERE ID = " + playerID);
+
+			if (Player.onlinePlayers.size() > position)
+				Player.onlinePlayers.remove(position);
+
 			// cleanup -- important
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeConnection(conn);
-			System.out.println("\nPlayer " + playerId + " is now offline.");
+			System.out.println("\nPlayer " + playerID + " is now offline.");
 		} 
 		catch (Exception e) {
-			System.out.println("Player " + playerId + "could not be set to offline.");
+			System.out.println("Player " + playerID + " could not be set to offline.");
 			e.printStackTrace();
 		}
 	}
@@ -126,7 +130,7 @@ public class DatabaseHandler {
 	public static void updateCoordinates(int id, int x, int y) throws SQLException {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
-		st.executeUpdate("UPDATE gameDB.players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE players.Id = " + id);
+		st.executeUpdate("UPDATE players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE ID = " + id);
 
 		// cleanup
 		DatabaseConnection.closeStatement(st);
@@ -137,7 +141,7 @@ public class DatabaseHandler {
 		try { // try to add an account here from username and password hash
 			String username = accountDetails[0];
 			String hashpw = accountDetails[1];
-
+			
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
 
@@ -147,8 +151,8 @@ public class DatabaseHandler {
 
 			/* id, name, level, class, x-pos, y-pos, online */
 			st.executeUpdate("INSERT INTO `players`" + "(`Name`, `Level`, `Class`, `X-Pos`," 
-					+ "`Y-Pos`, `Online`) VALUES ('" + username + "', 1, 'Rog', 0, 0, 0);");
-
+					+ "`Y-Pos`, `Online`) VALUES ('" + username + "', 1, 'NYI', 0, 0, 0);");
+			
 			// cleanup
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeConnection(conn);

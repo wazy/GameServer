@@ -27,7 +27,7 @@ public class ConsoleLogger implements Runnable {
 				}
 				else if (command.equals("online")) {
 					System.out.print("These players are online: ");
-					DatabaseHandler.queryOnline();
+					DatabaseHandler.queryWhoIsOnline();
 					System.out.print("\n");
 				}
 				else if (command.isEmpty()) {

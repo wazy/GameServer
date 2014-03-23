@@ -7,41 +7,40 @@ import java.sql.SQLException;
 public class AcceptPlayerCoordinates {
 	//public static volatile boolean Running = false;
 	
-	public static void acceptCoordinates(ObjectInputStream inputStream) throws SQLException, ClassNotFoundException {
+	public static void acceptCoordinates(ObjectInputStream inputStream, int playerID) throws SQLException, ClassNotFoundException {
+
 		System.out.println("Accepting player coordinates..");
+
 		try {
 			int counter = 0;
-			// not actually player's name but infact the listPosition is passed
-			// as second parameter (hack of course)
 			while (true) {
-				Player player = (Player) inputStream.readObject();
-				int position = Integer.parseInt(player.getName());
-				// System.out.println("Received updates from client..");
 
+				int position = inputStream.read();
+				int playerX = inputStream.read();
+				int playerY = inputStream.read();
 
 				synchronized (Player.onlinePlayers) {
-				// DB transaction to update player
+					// DB transaction and list operation to update player
 					if (Player.onlinePlayers.size() > position) {
-						Player.onlinePlayers.get(position).update(player.getX(), player.getY());
+						Player.onlinePlayers.get(position).update(playerX, playerY);
 						if (counter >= 100) { // DB transaction is more costly -- do it infrequently
-							DatabaseHandler.updateCoordinates(player.getId(), player.getX(), player.getY());
+							DatabaseHandler.updateCoordinates(playerID, playerX, playerY);
 							counter = 0;
 						}
-						counter++;
 					}
-					else if (Player.onlinePlayers.get(position-1).getId() == player.getId()) {
-						Player.onlinePlayers.get(position-1).update(player.getX(), player.getY());
-						if (counter >= 100) { // DB transaction is more costly -- do it infrequently
-							DatabaseHandler.updateCoordinates(player.getId(), player.getX(), player.getY());
+					else if (Player.onlinePlayers.get(position-1).getID() == playerID) {
+						Player.onlinePlayers.get(position-1).update(playerX, playerY);
+						if (counter >= 100) {
+							DatabaseHandler.updateCoordinates(playerID, playerX, playerY);
 							counter = 0;
 						}
-						counter++;
 					}
 					else {
-						System.out.println(Player.onlinePlayers.get(position-1).getId() + " " + player.getId());
+						System.out.println(Player.onlinePlayers.get(position-1).getID() + " " + playerID);
 						System.out.println("OUT OF BOUNDS! Position: " + position + " List size: " + Player.onlinePlayers.size());
 						return; // prevent out of bounds (player index not in list or moved)
 					}
+					counter++;
 				}
 			}
 		}
