@@ -7,7 +7,8 @@ import java.sql.SQLException;
 public class AcceptPlayerCoordinates {
 	//public static volatile boolean Running = false;
 	
-	public static void acceptCoordinates(ObjectInputStream inputStream, int playerID) throws SQLException, ClassNotFoundException {
+	public static void acceptCoordinates(ObjectInputStream inputStream, int playerID) 
+											throws SQLException, ClassNotFoundException {
 
 		System.out.println("Accepting player coordinates..");
 
@@ -19,6 +20,9 @@ public class AcceptPlayerCoordinates {
 				int playerX = inputStream.read();
 				int playerY = inputStream.read();
 
+				if (position < 0)
+					continue;
+				
 				synchronized (Player.onlinePlayers) {
 					// DB transaction and list operation to update player
 					if (Player.onlinePlayers.size() > position) {

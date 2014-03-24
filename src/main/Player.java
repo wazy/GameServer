@@ -51,7 +51,6 @@ public class Player implements Serializable {
 		return this.name;
 	}
 
-
 	public static int getPosition(int clientID) {
 		// absolutely necessary to synchronize when we iterate over collection
 		synchronized (Player.onlinePlayers) { 
