@@ -12,16 +12,18 @@ public class Creature implements Serializable {
 
 	public static List<Creature> creatureList = Collections.synchronizedList(new ArrayList<Creature>(16));
 	public static int listPosition = 0; // client's position in the list init to zero
-	public int id, x, y, alliance;
+	public int id, x, y, width, height, alliance;
 	public String name;
 	public boolean selected = false;
 	
-	Creature (int id, String name, int x, int y, int alliance) {
+	Creature (int id, String name, int x, int y, int width, int height, int alliance) {
 		this.id = id;
 		this.name = name;
 		this.alliance = alliance;
 		this.x = x;
 		this.y = y;
+		this.width = width;
+		this.height = height;
 	}
 	
 	boolean inBounds(int mouseX, int mouseY) {

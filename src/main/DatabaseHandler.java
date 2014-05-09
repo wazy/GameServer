@@ -174,10 +174,10 @@ public class DatabaseHandler {
 			Statement st = conn.createStatement();
 			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.creature_spawns;");
 
-			/* GUID, Name, X-Pos, Y-Pos, Faction */
+			/* GUID, Name, X-Pos, Y-Pos, Width, Height, Faction */
 			while (rst.next()) {
 				Creature creature = new Creature(rst.getInt("GUID"), rst.getString("Name"), 
-										rst.getInt("X-Pos"), rst.getInt("Y-Pos"), rst.getInt("Faction"));
+										rst.getInt("X-Pos"), rst.getInt("Y-Pos"), rst.getInt("Width"), rst.getInt("Height"), rst.getInt("Faction"));
 
 				Creature.creatureList.add(creature);
 			}
