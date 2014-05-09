@@ -21,7 +21,7 @@ public class SendPlayerCoordinates {
 
 			while (true) {
 
-				int n = Player.onlinePlayers.size();
+				int n = Player.onlinePlayers.size() - 1;
 
 				position = inputStream.read();
 				outputStream.write(n);
@@ -31,10 +31,13 @@ public class SendPlayerCoordinates {
 				for (int i = 0; i < n; i++) {
 					if (i != position) {
 						Player play = Player.onlinePlayers.get(i);
-						placeHolder[0] = play.getID();
-						placeHolder[1] = play.getX();
-						placeHolder[2] = play.getY();
-						outputStream.writeObject(placeHolder);
+						outputStream.write(play.getID());
+						outputStream.write(play.getX());
+						outputStream.write(play.getY());
+
+//						placeHolder[0] = play.getID();
+//						placeHolder[1] = play.getX();
+//						placeHolder[2] = play.getY();
 					}
 				}
 				outputStream.flush();
