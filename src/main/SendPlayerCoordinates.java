@@ -15,7 +15,8 @@ public class SendPlayerCoordinates {
 
 		try {
 
-			int[] placeHolder = new int[3];
+			//int[][] placeHolder = new int[16][3];
+
 			outputStream.writeObject(Player.onlinePlayers);
 			outputStream.flush();
 
@@ -26,11 +27,15 @@ public class SendPlayerCoordinates {
 				position = inputStream.read();
 				outputStream.write(n);
 
-				// reset so we don't write cached players
-				outputStream.reset();
 				for (int i = 0; i < n; i++) {
 					if (i != position) {
 						Player play = Player.onlinePlayers.get(i);
+						
+						//	String res = play.getID() + " " + play.getName() + " " 
+						//					+ play.getX() + " " + play.getY();
+							
+						//outputStream.writeObject(res);
+						
 						outputStream.write(play.getID());
 						outputStream.write(play.getX());
 						outputStream.write(play.getY());
@@ -39,8 +44,11 @@ public class SendPlayerCoordinates {
 //						placeHolder[1] = play.getX();
 //						placeHolder[2] = play.getY();
 					}
+					outputStream.flush();
 				}
-				outputStream.flush();
+
+				// reset so we don't write cached players
+				outputStream.reset();
 
 				// pause between updates
 				Thread.sleep(1000);
