@@ -63,4 +63,25 @@ public class Player implements Serializable {
 			return -1; // shouldn't get here
 		}
 	}
+
+	// send ID + X + Y as one int (make all size three)
+	public static int formatPlayerUpdatePacket(int ID, int X, int Y) {
+		int one = String.valueOf(ID).length();
+		int two = String.valueOf(X).length();
+		int three = String.valueOf(Y).length();
+
+		String res = helpFormatPlayerUpdatePacket(ID, one) + helpFormatPlayerUpdatePacket(X, two)
+					 									+ helpFormatPlayerUpdatePacket(Y, three);
+		
+		return Integer.parseInt(res);
+	}
+
+	// make 10 -> 010 or 3 -> 003 for update packet format 
+	public static String helpFormatPlayerUpdatePacket(int part, int length) {
+		String res = String.valueOf(part);
+		for (int i = length; i < 3; i++) {
+			res = 0 + res;
+		}
+		return res;
+	}
 }

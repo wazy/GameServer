@@ -11,56 +11,50 @@ public class SendPlayerCoordinates {
 
 		System.out.println("Sending player coordinates...");
 
-		int position = -1;
+		int clientPositionInList = -1;
 
 		try {
-
-			//int[][] placeHolder = new int[16][3];
 
 			outputStream.writeObject(Player.onlinePlayers);
 			outputStream.flush();
 
+			// pause between updates
+			Thread.sleep(2000);
+			
 			while (true) {
 
-				int n = Player.onlinePlayers.size() - 1;
-
-				position = inputStream.read();
+				int n = Player.onlinePlayers.size();
 				outputStream.write(n);
 
 				for (int i = 0; i < n; i++) {
-					if (i != position) {
-						Player play = Player.onlinePlayers.get(i);
-						
-						//	String res = play.getID() + " " + play.getName() + " " 
-						//					+ play.getX() + " " + play.getY();
-							
-						//outputStream.writeObject(res);
-						
-						outputStream.write(play.getID());
-						outputStream.write(play.getX());
-						outputStream.write(play.getY());
-
-//						placeHolder[0] = play.getID();
-//						placeHolder[1] = play.getX();
-//						placeHolder[2] = play.getY();
+					Player player = Player.onlinePlayers.get(i);
+					if (playerID != player.getID()) {
+						// ID: 1 X: 600 Y: 005
+						// Packet -> 001-600-005
+						int packet = Player.formatPlayerUpdatePacket(
+												player.getID(), player.getX(), player.getY());
+						outputStream.writeInt(packet);
+						System.out.println("SERVER PUP: " + packet);
+					}
+					else {
+						System.out.println("Sending position packet to " + i + " out of size " + n);
+						clientPositionInList = i;
+						outputStream.writeInt(clientPositionInList);
 					}
 					outputStream.flush();
 				}
 
 				// reset so we don't write cached players
-				outputStream.reset();
-
-				// pause between updates
-				Thread.sleep(1000);
+				//outputStream.reset();
 			}
 		} 
-		catch (SocketException e) {
-		} 
-		catch (IOException ioe) {
-		} 
+
+		catch (SocketException e) { }
+		catch (IOException ioe) { }
+
 		finally {
-			if (position >= 0)
-				DatabaseHandler.removeOnline(playerID, position);
+			if (clientPositionInList >= 0 && clientPositionInList < Player.onlinePlayers.size())
+				DatabaseHandler.removeOnline(playerID, clientPositionInList);
 		}
 	}
 }
