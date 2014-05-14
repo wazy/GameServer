@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import entities.Creature;
+
 public class SendCreatureCoordinates {
 	public static void updateClient(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException {
 		System.out.println("Sending creature coordinates thread started..");

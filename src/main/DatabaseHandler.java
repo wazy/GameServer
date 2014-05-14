@@ -4,6 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import entities.Creature;
+import entities.Player;
+
 public class DatabaseHandler {
 	// server console command
 	public static void queryWhoIsOnline() throws SQLException {

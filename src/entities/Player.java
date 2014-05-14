@@ -1,4 +1,4 @@
-package main;
+package entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,14 +15,14 @@ public class Player implements Serializable {
 	public String name;
 	public boolean selected = false;
 
-	Player(int id, String name, int x, int y) {
+	public Player(int id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
 		this.y = y;
 	}
 
-	void update(int dx, int dy) {
+	public void update(int dx, int dy) {
 		x = dx;
 		y = dy;
 	}

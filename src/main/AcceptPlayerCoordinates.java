@@ -4,6 +4,8 @@ import java.io.ObjectInputStream;
 import java.net.SocketException;
 import java.sql.SQLException;
 
+import entities.Player;
+
 public class AcceptPlayerCoordinates {
 	//public static volatile boolean Running = false;
 	

@@ -2,6 +2,8 @@ package main;
 
 import java.util.Random;
 
+import entities.Creature;
+
 public class CreatureHandler implements Runnable {
 	public void run() {
 		// TODO further implement this..

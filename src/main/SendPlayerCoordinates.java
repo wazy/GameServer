@@ -5,6 +5,8 @@ import java.io.ObjectOutputStream;
 import java.net.SocketException;
 import java.sql.SQLException;
 
+import entities.Player;
+
 public class SendPlayerCoordinates {
 	public static void sendOnlinePlayers(ObjectInputStream inputStream, ObjectOutputStream outputStream,
 												int playerID) throws InterruptedException, SQLException {

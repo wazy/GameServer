@@ -1,4 +1,4 @@
-package main;
+package entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ public class Creature implements Serializable {
 	public String name;
 	public boolean selected = false;
 	
-	Creature (int id, String name, int x, int y, int width, int height, int alliance) {
+	public Creature (int id, String name, int x, int y, int width, int height, int alliance) {
 		this.id = id;
 		this.name = name;
 		this.alliance = alliance;
@@ -26,7 +26,7 @@ public class Creature implements Serializable {
 		this.height = height;
 	}
 	
-	boolean inBounds(int mouseX, int mouseY) {
+	public boolean inBounds(int mouseX, int mouseY) {
 		if (mouseX > x && mouseX < x + 50 && mouseY > y && mouseY < y + 50)
 			return true;
 		else
