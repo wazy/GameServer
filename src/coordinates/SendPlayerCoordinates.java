@@ -1,9 +1,11 @@
-package main;
+package coordinates;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.SocketException;
 import java.sql.SQLException;
+
+import database.DatabaseHandler;
 
 import entities.Player;
 
@@ -19,32 +21,33 @@ public class SendPlayerCoordinates {
 
 			outputStream.writeObject(Player.onlinePlayers);
 			outputStream.flush();
-
-			// pause between updates
-			Thread.sleep(2000);
 			
 			while (true) {
 
 				int n = Player.onlinePlayers.size();
 				outputStream.write(n);
+				outputStream.flush();
 
+				// have to specify a 0 to update other players for client
 				for (int i = 0; i < n; i++) {
 					Player player = Player.onlinePlayers.get(i);
 					if (playerID != player.getID()) {
-						// ID: 1 X: 600 Y: 005
-						// Packet -> 001-600-005
-						int packet = Player.formatPlayerUpdatePacket(
-												player.getID(), player.getX(), player.getY());
-						outputStream.writeInt(packet);
-						System.out.println("SERVER PUP: " + packet);
+						System.out.println(player.getX() + ", "+ player.getY());
+						outputStream.write(0);
+						outputStream.writeObject(player);
+						outputStream.reset();
 					}
 					else {
 						System.out.println("Sending position packet to " + i + " out of size " + n);
+						outputStream.write(1);
 						clientPositionInList = i;
-						outputStream.writeInt(clientPositionInList);
+						outputStream.write(clientPositionInList);
 					}
 					outputStream.flush();
 				}
+				
+				// pause between updates
+				Thread.sleep(2000);
 
 				// reset so we don't write cached players
 				//outputStream.reset();

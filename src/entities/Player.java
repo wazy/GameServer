@@ -23,8 +23,13 @@ public class Player implements Serializable {
 	}
 
 	public void update(int dx, int dy) {
-		x = dx;
-		y = dy;
+		this.x += dx;
+		this.y += dy;
+	}
+	
+	public void setXY(int x, int y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	public int getX() {

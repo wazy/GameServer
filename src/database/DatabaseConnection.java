@@ -1,4 +1,4 @@
-package main;
+package database;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.util.Properties;

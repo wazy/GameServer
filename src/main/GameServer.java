@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import database.DatabaseConnection;
+import database.DatabaseHandler;
+
 public class GameServer {
 
 	private static ServerSocket socket = null;

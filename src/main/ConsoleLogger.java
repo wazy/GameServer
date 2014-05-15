@@ -3,6 +3,8 @@ package main;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import database.DatabaseHandler;
+
 /* handle console commands here */
 public class ConsoleLogger implements Runnable {
 	public void run() {

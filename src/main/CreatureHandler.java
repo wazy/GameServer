@@ -2,6 +2,8 @@ package main;
 
 import java.util.Random;
 
+import database.DatabaseHandler;
+
 import entities.Creature;
 
 public class CreatureHandler implements Runnable {
