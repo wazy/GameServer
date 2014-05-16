@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import coordinates.AcceptPlayerCoordinates;
 import coordinates.SendPlayerCoordinates;
@@ -13,6 +14,11 @@ import database.DatabaseHandler;
 import entities.Player;
 
 public class ClientConnection implements Runnable {
+	
+	private static boolean clientDisconnected;
+
+	public static AtomicInteger playerAcknowledgement = new AtomicInteger(0);
+	public static int disconnectedPosition = -1;
 	
 	private int clientID;
 	private int playerID;
@@ -186,5 +192,25 @@ public class ClientConnection implements Runnable {
 	// let client know which player it represents
 	public void setPlayerID(int playerID) {
 		this.playerID = playerID;
+	}
+
+	public static boolean isOtherClientDisconnected() {
+		return clientDisconnected;
+	}
+
+	public static void setOtherClientDisconnected(boolean value) {
+		clientDisconnected = value;
+	}
+
+	public static AtomicInteger getPlayerAcknowledgement() {
+		return playerAcknowledgement;
+	}
+
+	public static int getDisconnectedPosition() {
+		return disconnectedPosition;
+	}
+
+	public static void setDisconnectedPosition(int value) {
+		disconnectedPosition = value;
 	}
 }

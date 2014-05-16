@@ -48,7 +48,7 @@ public class Creature implements Serializable {
 	public void setY(int Y) {
 		this.y = Y;
 	}
-	
+
 	public static void setId(String creatureID) {
 		Creature.creatureID = Integer.parseInt(creatureID);
 	}

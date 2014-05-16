@@ -96,7 +96,7 @@ public class DatabaseHandler {
 
 			Player.onlinePlayers.add(player);
 			System.out.println(player.getName() + " is now online!");
-			st.executeUpdate("UPDATE gameDB.players SET ONLINE = 1 WHERE ID = " + ID);
+			st.executeUpdate("UPDATE `players` SET `ONLINE` = 1 WHERE `ID` = " + ID);
 
 			DatabaseConnection.closeStatement(st);
 			DatabaseConnection.closeConnection(conn);
@@ -113,7 +113,7 @@ public class DatabaseHandler {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			st.executeUpdate("UPDATE players SET Online = 0 WHERE ID = " + playerID);
+			st.executeUpdate("UPDATE `players` SET `Online` = 0 WHERE `ID` = " + playerID);
 
 			if (Player.onlinePlayers.size() > position)
 				Player.onlinePlayers.remove(position);
@@ -133,7 +133,7 @@ public class DatabaseHandler {
 	public static void updateCoordinates(int id, int x, int y) throws SQLException {
 		Connection conn = DatabaseConnection.getConnection();
 		Statement st = conn.createStatement();
-		st.executeUpdate("UPDATE players SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE ID = " + id);
+		st.executeUpdate("UPDATE `players` SET `X-Pos` = " + x + ", " + "`Y-Pos` = " + y + " WHERE `ID` = " + id);
 
 		// cleanup
 		DatabaseConnection.closeStatement(st);
@@ -152,20 +152,31 @@ public class DatabaseHandler {
 			st.executeUpdate("INSERT INTO `accounts` (`Username`, `Password`) VALUES (" +
 					"'" + username + "', '" + hashpw + "');");
 
+			/* this serves to determine correct ID for corresponding player insertion */
+			ResultSet rst = st.executeQuery("SELECT `ID` FROM `accounts` WHERE Username = '" + username + "';");
+			
+			int ID = -1;
+			
+			if (rst.next())
+				ID = rst.getInt(1);
+			else
+				return false;
+			
 			/* id, name, level, class, x-pos, y-pos, online */
-			st.executeUpdate("INSERT INTO `players`" + "(`Name`, `Level`, `Class`, `X-Pos`," 
-					+ "`Y-Pos`, `Online`) VALUES ('" + username + "', 1, 'NYI', 0, 0, 0);");
+			st.executeUpdate("INSERT INTO `players`" + "(`ID`, `Name`, `Level`, `Class`, `X-Pos`," 
+					+ "`Y-Pos`, `Online`) VALUES ("+ ID + ", '" + username + "', 1, 'Player-Entity', 0, 0, 0);");
 			
 			// cleanup
 			DatabaseConnection.closeStatement(st);
+			DatabaseConnection.closeResultSet(rst);
 			DatabaseConnection.closeConnection(conn);
 
 			return true;
 		}
-		// this will throw duplicate errors because of Unique constraint
-		// just silence the error and red text and tell client it can't continue
+		// this will throw duplicate errors because of Unique constraint / or consistency error
+		// just silence the error and red text and tell client it failed to register
 		catch (SQLException e) {
-			// e.printStackTrace();
+			//e.printStackTrace();
 			return false;
 		}
 	}
@@ -175,7 +186,7 @@ public class DatabaseHandler {
 		try {
 			Connection conn = DatabaseConnection.getConnection();
 			Statement st = conn.createStatement();
-			ResultSet rst = st.executeQuery("SELECT * FROM gameDB.creature_spawns;");
+			ResultSet rst = st.executeQuery("SELECT * FROM `creature_spawns`;");
 
 			/* GUID, Name, X-Pos, Y-Pos, Width, Height, Faction */
 			while (rst.next()) {

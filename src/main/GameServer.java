@@ -26,17 +26,17 @@ public class GameServer {
 
 			// all players should be offline at startup
 			DatabaseHandler.turnAllOffline();
-			
+
 			// handling randomizing creature movements here
 			Runnable creatureRunnable = new CreatureHandler();
 			Thread creatureThread = new Thread(creatureRunnable);
 			creatureThread.start();
-			
+
 			// start thread that reads console input here
 			Runnable loggerRunnable = new ConsoleLogger();
 			Thread loggerThread = new Thread(loggerRunnable);
 			loggerThread.start();
-			
+
 			System.out.println("\nGameServer initialized.. have fun!");
 			while (true) {
 				Socket connection = socket.accept();

@@ -4,6 +4,7 @@
 --
 -- --------------------------------------------------------
 
+DROP TABLE IF EXISTS `players`;
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `ID` int(4) NOT NULL AUTO_INCREMENT,
