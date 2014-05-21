@@ -1,14 +1,10 @@
 package coordinates;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.SocketException;
 import java.sql.SQLException;
 
 import main.ClientConnection;
-
 import database.DatabaseHandler;
-
 import entities.Player;
 
 public class SendPlayerCoordinates {
@@ -18,6 +14,7 @@ public class SendPlayerCoordinates {
 		System.out.println("Sending player coordinates...");
 
 		int clientPositionInList = -1;
+		boolean alreadyDisconnected = false;
 
 		try {
 
@@ -31,15 +28,23 @@ public class SendPlayerCoordinates {
 				outputStream.flush();
 
 				// TODO: rewrite this and make it nicer for telling players who disconnected
-				if (ClientConnection.isOtherClientDisconnected()) {
-					System.out.println("Telling other players to remove this player...");
+				if (!alreadyDisconnected && ClientConnection.isOtherClientDisconnected()) {
+					System.out.println("Another player is updating their list to remove this player...");
+					if (ClientConnection.getPlayerAcknowledgement().get() <= 0)
+						ClientConnection.setOtherClientDisconnected(false);
+
+					/* other client disconnected */
+					outputStream.write(1);
+
 					outputStream.write(ClientConnection.getDisconnectedPosition());
 					outputStream.flush();
 
-					if (ClientConnection.getPlayerAcknowledgement().decrementAndGet() <= 1)
-						ClientConnection.setOtherClientDisconnected(false);
+					ClientConnection.getPlayerAcknowledgement().decrementAndGet();
+					alreadyDisconnected = true;
 				}
 				else {
+					/* normal transmission */
+					outputStream.write(0);
 					// have to specify a type -> 0 to update other players for client
 					// 						  -> 1 to update player's position in list
 					for (int i = 0; i < n; i++) {
@@ -59,6 +64,7 @@ public class SendPlayerCoordinates {
 							outputStream.write(clientPositionInList);
 						}
 						outputStream.flush();
+						alreadyDisconnected = false;
 					}
 				}
 				// pause between updates
@@ -66,16 +72,18 @@ public class SendPlayerCoordinates {
 			}
 		} 
 
-		catch (SocketException e) { }
-		catch (IOException ioe) { }
+		catch (Exception e) {}
 
 		finally {
 			if (clientPositionInList >= 0 && clientPositionInList < Player.onlinePlayers.size()) {
 				DatabaseHandler.removeOnline(playerID, clientPositionInList);
 
-				ClientConnection.getPlayerAcknowledgement().set(Player.onlinePlayers.size()-1);
-				ClientConnection.setDisconnectedPosition(clientPositionInList);
-				ClientConnection.setOtherClientDisconnected(true);
+				// if other players are connected then inform them of a disconnect
+				if (Player.onlinePlayers.size() > 0) {
+					ClientConnection.getPlayerAcknowledgement().set(Player.onlinePlayers.size()-1);
+					ClientConnection.setDisconnectedPosition(clientPositionInList);
+					ClientConnection.setOtherClientDisconnected(true);
+				}
 			}
 		}
 	}

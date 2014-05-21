@@ -18,7 +18,7 @@ public class ClientConnection implements Runnable {
 	private static boolean clientDisconnected;
 
 	public static AtomicInteger playerAcknowledgement = new AtomicInteger(0);
-	public static int disconnectedPosition = -1;
+	public static AtomicInteger disconnectedPosition = new AtomicInteger(-1);
 	
 	private int clientID;
 	private int playerID;
@@ -207,10 +207,10 @@ public class ClientConnection implements Runnable {
 	}
 
 	public static int getDisconnectedPosition() {
-		return disconnectedPosition;
+		return disconnectedPosition.get();
 	}
 
 	public static void setDisconnectedPosition(int value) {
-		disconnectedPosition = value;
+		disconnectedPosition.set(value);
 	}
 }
