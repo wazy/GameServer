@@ -45,7 +45,7 @@ public class SendPlayerCoordinates {
 					for (int i = 0; i < n; i++) {
 						Player player = Player.onlinePlayers.get(i);
 						if (playerID != player.getID()) {
-							//System.out.println(player.getX() + ", "+ player.getY());
+							//System.out.println("SPC: " + player.getX() + ", "+ player.getY());
 							outputStream.write(0);
 							outputStream.writeObject(player);
 	

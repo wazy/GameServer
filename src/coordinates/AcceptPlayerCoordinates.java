@@ -21,10 +21,10 @@ public class AcceptPlayerCoordinates {
 			while (true) {
 
 				int position = inputStream.read();
-				int playerX = inputStream.read();
-				int playerY = inputStream.read();
+				int playerX = inputStream.readShort();
+				int playerY = inputStream.readShort();
 
-				//System.out.println(position + ", " + playerX + ", " + playerY);
+				//System.out.println("RP: " + position + ", " + playerX + ", " + playerY);
 
 				// client has disconnected
 				if (playerX < 0 && playerY < 0 && position < 0)
