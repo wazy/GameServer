@@ -29,8 +29,10 @@ public class SendPlayerCoordinates {
 
 				// TODO: rewrite this and make it nicer for telling players who disconnected
 				if (!alreadyDisconnected && ClientConnection.isOtherClientDisconnected()) {
+					ClientConnection.getPlayerAcknowledgement().decrementAndGet();
+
 					System.out.println("Another player is updating their list to remove this player...");
-					if (ClientConnection.getPlayerAcknowledgement().get() <= 0)
+					if (ClientConnection.getPlayerAcknowledgement().get() < 0)
 						ClientConnection.setOtherClientDisconnected(false);
 
 					/* other client disconnected */
@@ -39,7 +41,6 @@ public class SendPlayerCoordinates {
 					outputStream.write(ClientConnection.getDisconnectedPosition());
 					outputStream.flush();
 
-					ClientConnection.getPlayerAcknowledgement().decrementAndGet();
 					alreadyDisconnected = true;
 				}
 				else {

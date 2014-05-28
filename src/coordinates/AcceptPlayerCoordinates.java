@@ -36,24 +36,24 @@ public class AcceptPlayerCoordinates {
 				synchronized (Player.onlinePlayers) {
 					// DB transaction and list operation to update player
 					if (Player.onlinePlayers.size() > position) {
-						Player.onlinePlayers.get(position).setXY(playerX, playerY);
+						Player.onlinePlayers.get(position).teleport(playerX, playerY);
 						if (counter >= 100) { // DB transaction is more costly -- do it infrequently
 							DatabaseHandler.updateCoordinates(playerID, playerX, playerY);
 							counter = 0;
 						}
 					}
-					else if (Player.onlinePlayers.get(position-1).getID() == playerID) {
-						Player.onlinePlayers.get(position-1).setXY(playerX, playerY);
-						if (counter >= 100) {
-							DatabaseHandler.updateCoordinates(playerID, playerX, playerY);
-							counter = 0;
-						}
-					}
-					else {
-						System.out.println(Player.onlinePlayers.get(position-1).getID() + " " + playerID);
-						System.out.println("OUT OF BOUNDS! Position: " + position + " List size: " + Player.onlinePlayers.size());
-						return; // prevent out of bounds (player index not in list or moved)
-					}
+//					else if (Player.onlinePlayers.get(position-1).getID() == playerID) {
+//						Player.onlinePlayers.get(position-1).setXY(playerX, playerY);
+//						if (counter >= 100) {
+//							DatabaseHandler.updateCoordinates(playerID, playerX, playerY);
+//							counter = 0;
+//						}
+//					}
+//					else {
+//						System.out.println(Player.onlinePlayers.get(position-1).getID() + " " + playerID);
+//						System.out.println("OUT OF BOUNDS! Position: " + position + " List size: " + Player.onlinePlayers.size());
+//						return; // prevent out of bounds (player index not in list or moved)
+//					}
 					counter++;
 				}
 				Thread.sleep(200);

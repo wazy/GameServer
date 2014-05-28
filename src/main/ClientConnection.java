@@ -8,17 +8,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import coordinates.AcceptPlayerCoordinates;
 import coordinates.SendPlayerCoordinates;
-
 import database.DatabaseHandler;
-
 import entities.Player;
 
 public class ClientConnection implements Runnable {
-	
-	private static boolean clientDisconnected;
 
-	public static AtomicInteger playerAcknowledgement = new AtomicInteger(0);
-	public static AtomicInteger disconnectedPosition = new AtomicInteger(-1);
+	private static boolean clientDisconnected = false;
+
+	private static AtomicInteger playerAcknowledgement = new AtomicInteger(0);
+	private static AtomicInteger disconnectedPosition = new AtomicInteger(-1);
 	
 	private int clientID;
 	private int playerID;
@@ -194,11 +192,11 @@ public class ClientConnection implements Runnable {
 		this.playerID = playerID;
 	}
 
-	public static boolean isOtherClientDisconnected() {
+	public static synchronized boolean isOtherClientDisconnected() {
 		return clientDisconnected;
 	}
 
-	public static void setOtherClientDisconnected(boolean value) {
+	public static synchronized void setOtherClientDisconnected(boolean value) {
 		clientDisconnected = value;
 	}
 
