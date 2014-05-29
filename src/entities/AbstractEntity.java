@@ -7,15 +7,16 @@ public abstract class AbstractEntity implements EntityInterface, Serializable {
 	private static final long serialVersionUID = -8405971951484157839L;
 
 	protected String name;
-	protected int id, x, y, width, height;
+	protected int id, x, y, width, height, textureID;
 	
-	public AbstractEntity(int id, String name, int x, int y, int width, int height) {
+	public AbstractEntity(int id, String name, int x, int y, int width, int height, int textureID) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.textureID = textureID;
 	}
 
 	// Do nothing for now: stationary object
@@ -65,6 +66,11 @@ public abstract class AbstractEntity implements EntityInterface, Serializable {
 	}
 
 	@Override
+	public void setTextureID(int newTextureID) {
+		this.textureID = newTextureID;
+	}
+
+	@Override
 	public int getX() {
 		return x;
 	}
@@ -92,5 +98,10 @@ public abstract class AbstractEntity implements EntityInterface, Serializable {
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	@Override
+	public int getTextureID() {
+		return id;
 	}
 }

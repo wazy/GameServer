@@ -66,6 +66,7 @@ public class ClientConnection implements Runnable {
 						String name = userInfoArr[2];
 						int x = Integer.parseInt(userInfoArr[3]);
 						int y = Integer.parseInt(userInfoArr[4]);
+						int textureID = Integer.parseInt(userInfoArr[5]);
 
 						setPlayerID(id);
 
@@ -73,7 +74,7 @@ public class ClientConnection implements Runnable {
 						outputStream.writeInt(id);
 						outputStream.flush();
 
-						Player player = new Player(id, name, x, y);
+						Player player = new Player(id, name, x, y, textureID);
 
 						DatabaseHandler.turnOnline(id, player); 
 

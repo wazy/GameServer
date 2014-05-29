@@ -12,6 +12,7 @@ CREATE TABLE `players` (
   `Class` varchar(15) NOT NULL,
   `X-Pos` int(3) NOT NULL,
   `Y-Pos` int(3) NOT NULL,
+  `TextureID` int(3) NOT NULL,
   `Online` int(1) NOT NULL,
   PRIMARY KEY (`ID`),
   FOREIGN KEY (`ID`) REFERENCES accounts(`ID`)

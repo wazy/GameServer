@@ -17,8 +17,8 @@ public class Player extends AbstractMoveableEntity {
 	private static final int PLAYER_WIDTH = 50;
 	private static final int PLAYER_HEIGHT = 50;
 
-	public Player (int id, String name, int x, int y) {
-		super(id, name, x, y, PLAYER_WIDTH, PLAYER_HEIGHT);
+	public Player (int id, String name, int x, int y, int textureID) {
+		super(id, name, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, textureID);
 	}
 
 	public static int getPosition(int clientID) {
