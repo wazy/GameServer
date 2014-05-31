@@ -12,7 +12,7 @@ public interface EntityInterface {
 	public void setHeight(int height);
 	public void setID(int newID);
 	public void setName(String newName);
-	public void setTextureID(int newTexture);
+	public void setTextureName(String newTexture);
 
 	public int getX();
 	public int getY();
@@ -20,6 +20,6 @@ public interface EntityInterface {
 	public int getWidth();
 	public int getID();
 	public String getName();
-	public int getTextureID();
+	public String getTextureName();
 
 }

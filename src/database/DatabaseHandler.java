@@ -63,7 +63,7 @@ public class DatabaseHandler {
 				userInfo[0] = String.valueOf(ID);
 				userInfo[1] = rst.getString("Password");
 
-				/* id, name, level, class, x-pos, y-pos, textureID, online */
+				/* id, name, level, class, x-pos, y-pos, textureName, online */
 				rst = st.executeQuery("SELECT * FROM players WHERE ID = " + ID);
 
 				// return online player
@@ -71,7 +71,7 @@ public class DatabaseHandler {
 					userInfo[2] = rst.getString(2);			     // name
 					userInfo[3] = String.valueOf(rst.getInt(5)); // x-pos
 					userInfo[4] = String.valueOf(rst.getInt(6)); // y-pos
-					userInfo[5] = String.valueOf(rst.getInt(7)); // textureID
+					userInfo[5] = rst.getString(7); 			 // textureName
 				}
 			}
 
@@ -163,8 +163,8 @@ public class DatabaseHandler {
 			
 			/* id, name, level, class, x-pos, y-pos, online */
 			st.executeUpdate("INSERT INTO `players`" + "(`ID`, `Name`, `Level`, `Class`, `X-Pos`," 
-					+ "`Y-Pos`, `TextureID`, `Online`) VALUES ("
-					+ ID + ", '" + username + "', 1, 'Player-Entity', 0, 0, 1, 0);");
+					+ "`Y-Pos`, `TextureName`, `Online`) VALUES ("
+					+ ID + ", '" + username + "', 1, 'Player-Entity', 0, 0, 'PLAYER_IMAGE_1', 0);");
 			
 			// cleanup
 			DatabaseConnection.closeStatement(st);
