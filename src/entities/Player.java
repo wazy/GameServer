@@ -14,8 +14,8 @@ public class Player extends AbstractMoveableEntity {
 	public boolean selected = false;
 	public int id, x, y, width, height;
 	
-	private static final int PLAYER_WIDTH = 50;
-	private static final int PLAYER_HEIGHT = 50;
+	private static final int PLAYER_WIDTH = 32;
+	private static final int PLAYER_HEIGHT = 32;
 
 	public Player (int id, String name, int x, int y, String textureName) {
 		super(id, name, x, y, PLAYER_WIDTH, PLAYER_HEIGHT, textureName);
